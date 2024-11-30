@@ -1,0 +1,19 @@
+
+.v-field__outline {
+  color: rgb(var(--v-theme-inputBorder),0.5);
+  border-radius: 8px !important;
+}
+.inputWithbg {
+  .v-field--variant-outlined {
+    background-color: rgba(0, 0, 0, 0.025);
+  }
+}
+.v-field{
+  border-radius: 8px;
+}
+.v-field__input{
+  font-size: 14px !important;
+}
+.v-text-field input{
+  font-size: 14px;
+}
