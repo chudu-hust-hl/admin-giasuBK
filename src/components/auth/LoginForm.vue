@@ -2,8 +2,8 @@
   <v-row class="mb-3" style="padding: 22px">
     <v-col cols="12">
       <v-label class="font-weight-bold mb-1" style="font-size: 14px"
-        >Tài khoản</v-label
-      >
+        >Tài khoản
+      </v-label>
       <v-text-field
         v-model="userName"
         hide-details
@@ -11,9 +11,9 @@
       ></v-text-field>
     </v-col>
     <v-col cols="12">
-      <v-label class="font-weight-bold mb-1" style="font-size: 14px"
-        >Mật khẩu</v-label
-      >
+      <v-label class="font-weight-bold mb-1" style="font-size: 14px">
+        Mật khẩu
+      </v-label>
       <v-text-field
         v-model="password"
         hide-details
@@ -32,21 +32,26 @@
   </v-row>
   <notifications />
 </template>
+
+
+<!--Above is the template of the login form, how we see it
+Below is the script of the login form, how we excute the request-->
 <script>
 import {
   setToken,
   setUserName,
   setFullName,
   setPhoneNumber,
-  setEmployCode,
 } from "@/utils/auth";
 import { Login } from "@/api/user";
+
+
 export default {
   data() {
     return {
       userName: "",
       password: "",
-      show1: false,
+      show1: false, // hide password
     };
   },
   methods: {

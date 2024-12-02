@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      <h6 class="text-h6 px-3 py-2">Thông tin yêu cầu phụ huynh</h6>
+      <h6 class="text-h6 px-3 py-2">Thông tin phụ huynh đăng ký</h6>
     </v-card-title>
     <v-card-text>
       <v-row>
@@ -10,6 +10,7 @@
             label="Phụ huynh"
             v-model="parentEdit.NameParent"
           ></v-text-field>
+
           <v-text-field
             label="Tỉnh/TP"
             v-model="parentEdit.City"
@@ -42,10 +43,15 @@
             label="Liên hệ"
             v-model="parentEdit.PhoneEmail"
           ></v-text-field>
-          <v-text-field
-            label="Quận/huyện"
+
+          <v-select
             v-model="parentEdit.District"
-          ></v-text-field>
+            :items="districtLst"
+            label="Quận/huyện"
+            item-title="District"
+            item-value="District"
+            style="width: 100% !important"
+          ></v-select>
 
           <v-text-field
             label="Hình thức"
@@ -79,10 +85,16 @@
             item-value="value"
             style="width: 100% !important"
           ></v-select>
-          <v-text-field
-            label="Phường/xã"
+
+          <v-select
             v-model="parentEdit.Ward"
-          ></v-text-field>
+            :items="communeLst"
+            label="Phường/xã"
+            item-title="Commune"
+            item-value="Commune"
+            style="width: 100% !important"
+          ></v-select>
+
           <v-text-field label="Cấp" v-model="parentEdit.Level"></v-text-field>
           <v-text-field
             label="Lớp"
@@ -115,6 +127,11 @@
 
 <script>
 import { UpdateParentInfo } from "@/api/parent";
+import {
+  GetCity,
+  GetDistrictByCity,
+  GetCommuneByCityAndDistrict,
+} from "@/api/default";
 export default {
   props: {
     parentInfo: Object,
@@ -140,6 +157,9 @@ export default {
         },
       ],
       parentEdit: {},
+      cityLst: [],
+      districtLst: [],
+      communeLst: [],
     };
   },
   emits: ["btClose"],
@@ -147,8 +167,35 @@ export default {
     "parentInfo.ReqParentID"() {
       this.parentEdit = this.parentInfo;
     },
+    "parentEdit.District"() {
+      this.getDistrictByCity();
+    },
+    "parentEdit.Ward"() {
+      this.getCommuneByCityAndDistrict();
+    },
   },
   methods: {
+    getCity() {
+      GetCity({
+      }).then((res) => {
+        this.cityLst = res.Data;
+      });
+    },
+    getDistrictByCity() {
+      GetDistrictByCity({
+        City: this.parentEdit.City,
+      }).then((res) => {
+        this.districtLst = res.Data;
+      });
+    },
+    getCommuneByCityAndDistrict() {
+      GetCommuneByCityAndDistrict({
+        City: this.parentEdit.City,
+        District: this.parentEdit.District,
+      }).then((res) => {
+        this.communeLst = res.Data;
+      });
+    },
     updateParentInfo() {
       UpdateParentInfo({
         ReqParentID: this.parentEdit.ReqParentID,
@@ -169,7 +216,8 @@ export default {
     },
   },
   created() {
-    this.parentEdit = this.parentInfo;
+    this.parentEdit = this.parentInfo; 
+    this.getDistrictByCity();
   },
 };
 </script>

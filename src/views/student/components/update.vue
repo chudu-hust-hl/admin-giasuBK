@@ -173,29 +173,33 @@ export default {
     "studentInfo.ReqParentID"() {
       this.studentEdit = this.studentInfo;
     },
-    "studentEdit.City"() {
-      this.getDistrictByCity();
+    "studentEdit.City"(){
+      this.getCity();
     },
     "studentEdit.District"() {
+      this.getDistrictByCity();
+    },
+    "studentEdit.Ward"() {
       this.getCommuneByCityAndDistrict();
     },
   },
   methods: {
     getCity() {
-      GetCity({}).then((res) => {
+      GetCity({
+      }).then((res) => {
         this.cityLst = res.Data;
       });
     },
     getDistrictByCity() {
       GetDistrictByCity({
-        City: "Thành phố Hà Nội",
+        City: this.studentEdit.City,
       }).then((res) => {
         this.districtLst = res.Data;
       });
     },
     getCommuneByCityAndDistrict() {
       GetCommuneByCityAndDistrict({
-        City: "Thành phố Hà Nội",
+        City: this.studentEdit.City,
         District: this.studentEdit.District,
       }).then((res) => {
         this.communeLst = res.Data;
