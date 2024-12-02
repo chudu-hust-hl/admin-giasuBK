@@ -64,3 +64,12 @@ router.afterEach(() => {
   // finish progress bar
   // NProgress.done();
 });
+
+
+/**
+ * The navigation guard checks if the user is logged in by verifying the existence of a token.
+If the user is logged in and tries to access the login page, they are redirected to the home page.
+If the user is logged in but lacks user information, an attempt is made to fetch that information.
+If the user is not logged in, they are either allowed to access public routes or redirected to the login page if they attempt to access protected routes.
+This structure ensures that only authenticated users can access certain routes, enhancing the security of the application.
+ */

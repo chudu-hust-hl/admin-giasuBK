@@ -8,10 +8,3 @@ export function Login(data) {
     data: data,
   });
 }
-export function GetEmployLst(data) {
-  return request({
-    url: "User/GetEmployLst",
-    method: "post",
-    data: data,
-  });
-}

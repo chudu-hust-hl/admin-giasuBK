@@ -3,96 +3,6 @@
     <v-card-title>
       <div class="d-flex" style="justify-content: space-between">
         <h6 class="text-h6 py-2">Danh sách phụ huynh tìm gia sư</h6>
-        <div>
-          <!-- <v-btn
-            color="success"
-            variant="tonal"
-            icon="mdi-microsoft-excel"
-            style="height: 42px"
-            class="mr-1"
-            @click="btExportExcel"
-          ></v-btn> -->
-          <!-- <span>
-            <v-menu
-              v-model="isMenuSearch"
-              activator="parent"
-              transition="slide-y-transition"
-              :close-on-content-click="false"
-            >
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  color="primary"
-                  variant="tonal"
-                  icon="mdi-account-search"
-                  style="height: 42px"
-                  class="mr-1"
-                  v-bind="props"
-                ></v-btn>
-              </template>
-              <v-card width="300" style="padding-top: 20px !important">
-                <v-card-text>
-                  <v-text-field
-                    v-model="dataSearchPhone"
-                    label="Số điện thoại / Mã tổ chức"
-                    prepend-inner-icon="mdi-magnify"
-                    hide-details
-                    color="primary"
-                  />
-
-                  <v-btn
-                    class="mt-2"
-                    variant="tonal"
-                    color="primary"
-                    block
-                    :loading="loadding"
-                    @click="searchHistoryUser"
-                  >
-                    Tìm kiếm</v-btn
-                  >
-                </v-card-text>
-              </v-card>
-            </v-menu>
-          </span> -->
-          <!-- <span>
-            <v-menu
-              v-model="isMenuCare"
-              activator="parent"
-              transition="slide-y-transition"
-              :close-on-content-click="false"
-            >
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  color="error"
-                  variant="tonal"
-                  icon="mdi-face-agent"
-                  style="height: 42px"
-                  v-bind="props"
-                ></v-btn>
-              </template>
-              <v-card width="300" style="padding-top: 20px !important">
-                <v-card-text>
-                  <v-text-field
-                    v-model="searchCustomer"
-                    label="Nhân viên chăm sóc"
-                    prepend-inner-icon="mdi-magnify"
-                    hide-details
-                    color="error"
-                  />
-
-                  <v-btn
-                    class="mt-2"
-                    variant="tonal"
-                    color="error"
-                    block
-                    @click="btSearchCustomerCare"
-                  >
-                    Tìm kiếm</v-btn
-                  >
-                </v-card-text>
-              </v-card>
-            </v-menu>
-          </span> -->
-        </div>
       </div>
     </v-card-title>
     <v-data-table-server
@@ -116,29 +26,6 @@
     >
       <template v-slot:top>
         <div class="d-flex flex-wrap gap-2">
-          <span>
-            <v-select
-              v-model="districtName"
-              :items="districtLst"
-              label="Quận/huyện"
-              item-title="District"
-              item-value="District"
-              class="ml-1"
-              style="width: 200px !important"
-              hide-details
-            ></v-select>
-          </span>
-          <span>
-            <v-select
-              v-model="communeName"
-              :items="communeLst"
-              label="Phường/xã"
-              item-title="Commune"
-              item-value="Commune"
-              style="width: 200px !important"
-              hide-details
-            ></v-select>
-          </span>
           <span>
             <v-text-field
               v-model="search"
@@ -185,10 +72,6 @@
 
 <script>
 import { GetParentLst } from "@/api/parent";
-
-import { GetDistrictByCity, GetCommuneByCityAndDistrict } from "@/api/default";
-
-import { formatDateDisplay, formatDateUpload } from "@/helpers/getTime";
 import Update from "./components/update.vue";
 import { exportExcel } from "./function";
 
@@ -203,10 +86,6 @@ export default {
       pageNumber: 1,
       rowspPage: 10,
       search: "",
-      districtLst: [],
-      districtName: "",
-      communeLst: [],
-      communeName: "",
       headers: [
         { title: "STT", sortable: false, key: "Key", width: 50 },
         { title: "Trạng thái", key: "Status", sortable: false },
@@ -244,9 +123,6 @@ export default {
     };
   },
   watch: {
-    districtName() {
-      this.getCommuneByCityAndDistrict();
-    },
     pageNumber() {
       this.getParentLst();
     },
@@ -255,9 +131,6 @@ export default {
     },
   },
   methods: {
-    btClose() {
-      this.isShowInfo = false;
-    },
     btShowInfo(data) {
       this.isShowInfo = true;
       this.parentInfo = data;
@@ -276,25 +149,6 @@ export default {
         return { text: "Xong", color: "success" };
       }
     },
-    getDistrictByCity() {
-      GetDistrictByCity({
-        City: "Thành phố Hà Nội",
-      }).then((res) => {
-        if (res.RespCode == 0) {
-          this.districtLst = res.Data;
-        }
-      });
-    },
-    getCommuneByCityAndDistrict() {
-      GetCommuneByCityAndDistrict({
-        City: "Thành phố Hà Nội",
-        District: this.districtName,
-      }).then((res) => {
-        if (res.RespCode == 0) {
-          this.communeLst = res.Data;
-        }
-      });
-    },
     getParentLst() {
       GetParentLst({
         PageNumber: this.pageNumber,
@@ -312,6 +166,9 @@ export default {
         }
       });
     },
+    btClose() {
+      this.isShowInfo = false;
+    },
     btPage(data) {
       this.pageNumber = data;
     },
@@ -321,7 +178,6 @@ export default {
   },
   created() {
     this.getParentLst();
-    this.getDistrictByCity();
   },
 };
 </script>
