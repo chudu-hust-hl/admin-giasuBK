@@ -9,53 +9,48 @@
             <h6 class="text-h6 mb-4">Thông tin phụ huynh</h6>
             <v-text-field
               label="Phụ huynh"
-              v-model="parentEdit.NameParent"
+              v-model="classEdit.NameParent"
             ></v-text-field>
             <v-text-field
               label="Liên hệ Phụ huynh"
-              v-model="parentEdit.PhoneEmail"
+              v-model="classEdit.PhoneParent"
             ></v-text-field>
             <v-text-field
               label="Tỉnh/TP"
-              v-model="parentEdit.City"
+              v-model="classEdit.City"
             ></v-text-field>
             <v-text-field
               label="Quận/huyện"
-              v-model="parentEdit.District"
+              v-model="classEdit.District"
             ></v-text-field>
             <v-text-field
               label="Địa chỉ"
-              v-model="parentEdit.AddressParent"
+              v-model="classEdit.AddressParent"
             ></v-text-field>
           </v-col>
           <v-col cols="4">
             <h6 class="text-h6 mb-4">Thông tin gia sư</h6>
 
-            <!-- Dropdown for selecting students -->
-            <v-select
-              v-model="parentEdit.selectedStudent"
-              :items="studentList"
-              item-title="StudentID"
-              item-value="StudentID"
-              label="Chọn gia sư"
-            >
-            
-            </v-select>
-
             <!-- Student fields -->
             <v-text-field
               label="Gia sư"
-              :model-value="selectedStudentDetails.name"
+              :model-value="classEdit.StudentID"
+              readonly
+            ></v-text-field>
+
+            <v-text-field
+              label="Gia sư"
+              :model-value="classEdit.StudentName"
               readonly
             ></v-text-field>
             <v-text-field
               label="Liên hệ Gia sư"
-              :model-value="selectedStudentDetails.phone"
+              :model-value="classEdit.PhoneStudent"
               readonly
             ></v-text-field>
             <v-text-field
-              label="Địa chỉ"
-              :model-value="selectedStudentDetails.address"
+              label="Danh sách sinh viên ứng tuyển"
+              :model-value="classEdit.Apply"
               readonly
             ></v-text-field>
           </v-col>
@@ -63,10 +58,10 @@
             <h6 class="text-h6 mb-4">Thông tin lớp học</h6>
             <v-text-field
               label="TG tạo"
-              v-model="parentEdit.TimeCreate"
+              v-model="classEdit.TimeCreate"
             ></v-text-field>
             <v-select
-              v-model="parentEdit.Status"
+              v-model="classEdit.Status"
               :items="statusLst"
               label="Trạng thái"
               item-title="text"
@@ -75,19 +70,19 @@
             ></v-select>
             <v-text-field
               label="Lớp"
-              v-model="parentEdit.ValueClass"
+              v-model="classEdit.ValueClass"
             ></v-text-field>
             <v-text-field
               label="Môn"
-              v-model="parentEdit.Subjects"
+              v-model="classEdit.Subjects"
             ></v-text-field>
             <v-text-field
-              v-model="parentEdit.Money"
+              v-model="classEdit.Money"
               label="Học phí"
               type="number"
             ></v-text-field>
             <v-select
-              v-model="parentEdit.PaymentSta"
+              v-model="classEdit.PaymentSta"
               label="Tình trạng học phí"
               :items="tuitionLst"
               item-title="text"
@@ -102,23 +97,22 @@
         <v-btn color="blue-darken-1" variant="text" @click="btClose">
           Đóng
         </v-btn>
-        <v-btn @click="updateData"> Lưu thông tin </v-btn>
+        <v-btn @click="updateClassInfo"> Lưu thông tin </v-btn>
       </v-card-actions>
     </v-card>
   </template>
   
   <script>
-  import { UpdateParentInfo } from "@/api/parent";
-  import { GetStudentLst, GSAddStudentByParentID } from "@/api/student";
+  import { UpdateClassInfo } from "@/api/class";
   import {
     GetCity,
     GetDistrictByCity,
     GetCommuneByCityAndDistrict,
-  } from "@/api/default";
+  } from "@/api/location";
   
   export default {
     props: {
-      parentInfo: Object,
+      classInfo: Object,
     },
     data() {
       return {
@@ -133,7 +127,7 @@
           },
           {
             value: 2,
-            text: "Treo",
+            text: "Đang dạy",
           },
           {
             value: 3,
@@ -150,48 +144,26 @@
             text: "Đã thanh toán",
           },
         ],
-        studentList: [],
-        selectedStudent: null,
-        currentStudent: null,
-        isLoading: false,
-        parentEdit: {},
+        classEdit: {},
         cityLst: [],
         districtLst: [],
         communeLst: [],
-        menu: false,
       };
     },
     emits: ["btClose"],
     watch: {
-      'parentEdit.City'() {
+      "classInfo.ClassID"() {
+        this.classEdit = this.classInfo;
+      },
+      'classEdit.City'() {
+        this.getCity();
+      },
+      'classEdit.District'() {
         this.getDistrictByCity();
       },
-      'parentEdit.District'() {
+      'classEdit.Ward'() {
         this.getCommuneByCityAndDistrict();
       },
-      "parentInfo.ReqParentID"() {
-        this.parentEdit = this.parentInfo;
-      },
-      "studentInfo.ReqParentID"() {
-        this.studentEdit = this.studentInfo;
-      },
-      "studentEdit.City"() {
-        this.getDistrictByCity();
-      },
-      "studentEdit.District"() {
-        this.getCommuneByCityAndDistrict();
-      },
-      'parentEdit.selectedStudent'(newVal) {
-        if (newVal) {
-          // Find the selected student from studentList
-          this.currentStudent = this.studentList.find(
-            student => student.StudentID === newVal
-          );
-          console.log('Selected student details:', this.currentStudent); // Debug log
-        } else {
-          this.currentStudent = null;
-        }
-      }
     },
 
     computed: {
@@ -207,173 +179,47 @@
     methods: {
       getCity() {
         GetCity({}).then((res) => {
-          this.cityLst = res.Data;
+          this.cityLst = res.LocationLst;
         });
       },
       getDistrictByCity() {
         GetDistrictByCity({
-          City: this.parentEdit.City,
+          City: this.classEdit.City,
         }).then((res) => {
-          this.districtLst = res.Data;
+          this.districtLst = res.LocationLst;
         });
       },
       getCommuneByCityAndDistrict() {
         GetCommuneByCityAndDistrict({
-          City: this.parentEdit.City,
-          District: this.parentEdit.District,
+          City: this.classEdit.City,
+          District: this.classEdit.District,
         }).then((res) => {
-          this.communeLst = res.Data;
+          this.communeLst = res.LocationLst;
         });
       },
 
-      getStudentLst() {
-        this.isLoading = true; // Show loading state
-        GetStudentLst({
-          PageNumber: 1, // Start from page 1
-          RowspPage: 1000, // Number of records to fetch
-          Search: "", // Empty search term to get all students
-        })
-        .then((res) => {
-          if (res.RespCode === 0) {
-            this.studentList = res.Data.map(student => ({
-              StudentID: student.StudentID,
-              StudentName: student.StudentName,
-              Phone: student.Phone,
-              SexStudent: student.SexStudent,
-              Address: student.Address,
-            }));
-          } else {
-            console.error('Error loading students:', res);
-            this.studentList = [];
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching students:', error);
-          this.studentList = [];
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-      },
-
-      addStudentByParentID() {
-
-        console.log('Adding student. Parent ID:', this.parentEdit.ReqParentID);
-        console.log('Selected student ID:', this.parentEdit.selectedStudent);
-        // Check if both parent and student are selected
-        if (this.parentEdit.selectedStudent && this.parentEdit.ReqParentID) {
-          const params = {
-            ReqParentID: this.parentEdit.ReqParentID,
-            StudentID: this.parentEdit.selectedStudent,  // Since v-select returns the value directly
-            Status: this.parentEdit.Status || 0, // Default to 1 if not set
-            Money: this.parentEdit.Money || 0,  // Add tuition fee if needed
-            PaymentSta: this.parentEdit.PaymentSta || 0 // Add payment status if needed
-          };
-
-          console.log('Adding student to parent with params:', params); // Debug log
-
-          GSAddStudentByParentID(params)
-            .then((res) => {
-              if (res.RespCode === 0) {
-                this.$notify({
-                  type: "success",
-                  title: "Thành công",
-                  text: "Thêm gia sư cho phụ huynh thành công",
-                });
-              } else {
-                this.$notify({
-                  type: "error",
-                  title: "Lỗi",
-                  text: res.RespMsg || "Không thể thêm gia sư cho phụ huynh",
-                });
-              }
-            })
-            .catch((error) => {
-              console.error('Error adding student to parent:', error);
-              this.$notify({
-                type: "error",
-                title: "Lỗi",
-                text: "Đã xảy ra lỗi khi thêm gia sư cho phụ huynh",
-              });
+      updateClassInfo() {
+        UpdateClassInfo({
+          ClassID: this.classEdit.ClassID,
+          ClassInfo: this.classEdit,
+        }).then((res) => {
+          if (res.RespCode == 0) {
+            notify({
+              type: "success",
+              title: "Thành công",
+              text: "Cập nhật yêu cầu tìm gia sư thành công",
             });
-        } else {
-          this.$notify({
-            type: "warning",
-            title: "Cảnh báo",
-            text: "Vui lòng chọn gia sư trước khi cập nhật",
-          });
-        }
+            this.btClose();
+          }
+        });
       },
       
-
-      updateData() {
-        // Check if a student is selected
-        if (!this.parentEdit.selectedStudent) {
-          this.$notify({
-            type: "warning",
-            title: "Cảnh báo",
-            text: "Vui lòng chọn gia sư trước khi cập nhật",
-          });
-          return;
-        }
-
-        // Update parent data
-        const updatedParentInfo = {
-          ...this.parentEdit,
-          StudentID: this.parentEdit.selectedStudent // Make sure to include the selected student
-        };
-
-        UpdateParentInfo({
-          ReqParentID: this.parentEdit.ReqParentID,
-          ParentInfo: updatedParentInfo,
-        })
-        .then((res) => {
-          if (res.RespCode === 0) {
-            // Get the ParentID from the response if it's returned
-            if (res.Data && res.Data.ReqParentID) {
-              this.parentEdit.ReqParentID = res.Data.ReqParentID;
-            }
-            console.log('Parent updated, ParentID:', this.parentEdit.ReqParentID); // Debug log
-            
-            // Only proceed with adding student if we have a ParentID
-            if (this.parentEdit.ReqParentID) {
-              return this.addStudentByParentID();
-            } else {
-              throw new Error('ParentID not available after update');
-            }
-          } else {
-            throw new Error(res.RespMsg || "Không thể cập nhật thông tin phụ huynh");
-          }
-        })
-        .then(() => {
-          this.$notify({
-            type: "success",
-            title: "Thành công",
-            text: "Cập nhật thông tin thành công",
-          });
-          this.btClose();
-        })
-        .catch((error) => {
-          console.error('Error in update process:', error);
-          this.$notify({
-            type: "error",
-            title: "Lỗi",
-            text: error.message || "Đã xảy ra lỗi trong quá trình cập nhật",
-          });
-        });
-        this.btClose();
-      },
       btClose() {
         this.$emit("btClose");
       },
     },
     created() {
-      this.parentEdit = this.parentInfo;
-      this.getStudentLst();
-      if (this.parentEdit.StudentID) {
-        this.parentEdit.selectedStudent = this.parentEdit.StudentID;
-        this.currentStudent = this.studentList.find(student => student.StudentID === this.parentEdit.StudentID);
-      }
+      this.classEdit = this.classInfo;
       this.getCity();
       // If there's an existing student, set it
     },

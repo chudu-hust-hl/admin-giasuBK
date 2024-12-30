@@ -74,6 +74,7 @@
 import { GetParentLst } from "@/api/parent";
 import Update from "./components/update.vue";
 import { exportExcel } from "./function";
+import { getUserName, getToken } from "@/utils/auth";
 
 export default {
   components: {
@@ -88,8 +89,9 @@ export default {
       search: "",
       headers: [
         { title: "STT", sortable: false, key: "Key", width: 50 },
-        { title: "Trạng thái", key: "Status", sortable: false },
+        /*{ title: "Trạng thái", key: "Status", sortable: false },*/
         { title: "Phụ huynh", key: "NameParent", sortable: false },
+        { title: "SĐT", key: "PhoneParent", sortable: false , align: "center"},
         { title: "Địa chỉ", key: "AddressParent", sortable: false },
         { title: "Cấp", key: "Level", sortable: false, align: "center" },
         { title: "Lớp", key: "ValueClass", sortable: false, align: "center" },
@@ -100,12 +102,12 @@ export default {
           sortable: false,
           align: "center",
         },
-        {
+        /*{
           title: "SL sv",
           key: "QuantityStudent",
           sortable: false,
           align: "center",
-        },
+        },*/
         {
           title: "Hỗ trợ",
           key: "NameSupports",
@@ -143,7 +145,7 @@ export default {
         return { text: "Mới tạo", color: "more" };
       }
       if (status == 2) {
-        return { text: "Treo", color: "blue" };
+        return { text: "Đang dạy", color: "blue" };
       }
       if (status == 3 || status == 4) {
         return { text: "Xong", color: "success" };
@@ -152,11 +154,12 @@ export default {
     getParentLst() {
       GetParentLst({
         PageNumber: this.pageNumber,
-        RowspPage: this.rowspPage,
+        RowsPage: this.rowspPage,
         Search: this.search,
       }).then((res) => {
+        console.log("API Response:", res);
         if (res.RespCode == 0) {
-          this.desserts = res.ParentLst.map((item, index) => {
+          this.desserts = res.ParentList.map((item, index) => {
             return {
               ...item,
               Key: index + 1,

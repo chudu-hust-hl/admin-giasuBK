@@ -2,15 +2,23 @@ import post from '@/utils/request'
 
 export function GetStudentLst(data) {
   return post({
-    url: 'GSStudent/GetStudentLst',
+    url: 'GSStudent/GetStudentReqList',
     method: 'post',
     data
   })
 }
 
-export function GSUpdateStudent(data) {
+export function GetStudentBasicLst(data) {
   return post({
-    url: 'GSStudent/GSUpdateStudent',
+    url: 'GSStudent/GetStudentBasicInfo',
+    method: 'post',
+    data
+  })
+}
+
+export function UpdateStudentReqInfo(data) {
+  return post({
+    url: 'GSStudent/UpdateStudentReqInfo',
     method: 'post',
     data
   })

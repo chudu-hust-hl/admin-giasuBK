@@ -15,8 +15,7 @@ import { useNotification } from "@kyvg/vue3-notification";
 
 const notification = useNotification();
 const service = axios.create({
-  baseURL: "http://202.191.56.71/GiaSuBKAPI/",
-  // baseURL: "http://localhost:44375/",
+  baseURL: "https://ctsv.hust.edu.vn/",
   withCredentials: true, // send cookies when cross-domain requests
   timeout: 20000, // request timeout
   headers: {

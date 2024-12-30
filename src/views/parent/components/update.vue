@@ -41,7 +41,7 @@
         <v-col cols="4">
           <v-text-field
             label="Liên hệ"
-            v-model="parentEdit.PhoneEmail"
+            v-model="parentEdit.PhoneParent"
           ></v-text-field>
 
           <v-select
@@ -131,7 +131,7 @@ import {
   GetCity,
   GetDistrictByCity,
   GetCommuneByCityAndDistrict,
-} from "@/api/default";
+} from "@/api/location";
 export default {
   props: {
     parentInfo: Object,
@@ -149,7 +149,7 @@ export default {
         },
         {
           value: 2,
-          text: "Treo",
+          text: "Đang dạy",
         },
         {
           value: 3,
@@ -167,6 +167,9 @@ export default {
     "parentInfo.ReqParentID"() {
       this.parentEdit = this.parentInfo;
     },
+    "parentEdit.City"() {
+      this.getCity();
+    },
     "parentEdit.District"() {
       this.getDistrictByCity();
     },
@@ -178,14 +181,14 @@ export default {
     getCity() {
       GetCity({
       }).then((res) => {
-        this.cityLst = res.Data;
+        this.cityLst = res.LocationLst;
       });
     },
     getDistrictByCity() {
       GetDistrictByCity({
         City: this.parentEdit.City,
       }).then((res) => {
-        this.districtLst = res.Data;
+        this.districtLst = res.LocationLst;
       });
     },
     getCommuneByCityAndDistrict() {
@@ -193,7 +196,7 @@ export default {
         City: this.parentEdit.City,
         District: this.parentEdit.District,
       }).then((res) => {
-        this.communeLst = res.Data;
+        this.communeLst = res.LocationLst;
       });
     },
     updateParentInfo() {
