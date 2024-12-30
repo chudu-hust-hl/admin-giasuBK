@@ -145,18 +145,19 @@ export default {
       if (status == 4) {
         return { text: "Đang dạy", color: "success" };
       }
+      else{
+        return { text: "Unknown", color: "grey" };
+      }
     },
     getStudentLst() {
       GetStudentLst({
         PageNumber: this.pageNumber,
-        RowspPage: this.rowspPage,
+        RowsPage: this.rowspPage,
         Search: this.search,
-        District: this.districtName,
-        Ward: this.communeName,
       }).then((res) => {
         if (res.RespCode == 0) {
-          this.desserts = res.Data.map((item, index) => {
-          var row = (this.pageNumber - 1)* this.rowspPage
+          this.desserts = res.StudentList.map((item, index) => {
+          var row = (this.pageNumber - 1)* this.rowsPage
             return {
               ...item,
               Key: index + 1 + row,

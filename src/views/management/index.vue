@@ -41,7 +41,7 @@
               variant="tonal"
               icon="mdi-magnify"
               style="height: 42px"
-              @click="getParentLst"
+              @click="getClassList"
             ></v-btn>
           </div>
         </template>
@@ -71,15 +71,14 @@
     </v-card>
   
     <v-dialog v-model="isShowInfo" persistent width="1000"
-      ><Update :parentInfo="parentInfo" @btClose="btClose" />
+      ><Update :classInfo="classInfo" @btClose="btClose" />
     </v-dialog>
   
     <notifications />
   </template>
 
 <script>
-import { GetParentLst } from "@/api/parent";
-import { GetStudentLst } from "@/api/student";
+import { GetClassList } from "@/api/class";
 
 
 import { formatDateDisplay, formatDateUpload } from "@/helpers/getTime";
@@ -96,11 +95,11 @@ export default {
         { title: "STT", sortable: false, key: "Key", width: 50 },
         { title: "Trạng thái", key: "Status", sortable: false },
         { title: "Phụ huynh", key: "NameParent", sortable: false },
-        { title: "SĐT Phụ huynh", key: "PhoneEmail", sortable: false, align: "center"},
+        { title: "SĐT Phụ huynh", key: "PhoneParent", sortable: false, align: "center"},
         { title: "Lớp", key: "ValueClass", sortable: false, align: "center" },
         { title: "Môn", key: "Subjects", sortable: false, align: "center" },
-        { title: "Gia sư", key: "NameStudent", sortable: false},
-        { title: "SĐT Gia sư", key: "Phone", sortable: false},
+        { title: "Gia sư", key: "StudentName", sortable: false},
+        { title: "SĐT Gia sư", key: "PhoneStudent", sortable: false},
         { title: "Thời gian ĐK", key: "TimeCreate", sortable: false},
         { title: "Học phí", key: "Money", sortable: false},
         { title: "Thanh toán", key: "MoneySta", sortable: false}, 
@@ -111,19 +110,16 @@ export default {
       rowspPage: 10,
       search: "",
       studentInfo: {},
-      parentInfo: {},
+      classInfo: {},
       dataLength: 0,
     };
   },
   watch: {
-    districtName() {
-      this.getCommuneByCityAndDistrict();
-    },
     pageNumber() {
-      this.getParentLst();
+      this.getClassList();
     },
     rowspPage() {
-      this.getParentLst();
+      this.getClassList();
     },
   },
   methods: {
@@ -132,29 +128,44 @@ export default {
     },
     btShowInfo(data) {
       this.isShowInfo = true;
-      this.parentInfo = data;
+      this.classInfo = data;
     },
     getStatus(status) {
-      if (status == 0) {
+      if(status==0){
         return { text: "Hủy", color: "error" };
       }
-      if (status ==1 | status == 2) {
-        return { text: "Đang tìm", color: "#FFC107" };
+      if (status == 1) {
+        return { text: "Đang tìm", color: "more" };
       }
-      if (status == 3) {
+      if (status == 2) {
+        return { text: "Đang dạy", color: "success" };
+      }
+      if (status == 3 || status == 4) {
         return { text: "Xong", color: "success" };
       }
+      return {text: "Undefined", color: "blue"};
     },
-    getParentLst() {
-      GetParentLst({
+    getMoneySta(status){
+      if(status==0){
+        return { text: "Chưa trả", color: "error" };
+      }
+      if (status == 1) {
+        return { text: "Đã trả", color: "success" };
+      }
+      if (status == 2) {
+        return { text: "Đã trả cọc", color: "more" };
+      }
+      return {text: "Undefined", color: "blue"};
+    },
+    getClassList() {
+      GetClassList({
         PageNumber: this.pageNumber,
-        RowspPage: this.rowspPage,
+        RowsPage: this.rowspPage,
         Search: this.search,
       }).then((res) => {
+        console.log("API Response:", res);
         if (res.RespCode == 0) {
-          console.log('Raw API Response:', res);
-          console.log('ParentLst:', res.ParentLst);
-          this.desserts = res.ParentLst.map((item, index) => {
+          this.desserts = res.ClassList.map((item, index) => {
             return {
               ...item,
               Key: index + 1,
@@ -164,35 +175,9 @@ export default {
         }
       });
     },
-    getStudentLst() {
-      GetStudentLst({
-        PageNumber: this.pageNumber,
-        RowspPage: this.rowspPage,
-        District: this.districtName,
-        Ward: this.communeName,
-      }).then((res) => {
-        if (res.RespCode == 0) {
-          this.desserts = res.Data.map((item, index) => {
-          var row = (this.pageNumber - 1)* this.rowspPage
-            return {
-              ...item,
-              Key: index + 1 + row,
-              };
-          });
-          this.dataLength = res.TotalRows;
-        }
-      });
+    btClose() {
+      this.isShowInfo = false;
     },
-    getMoneySta(status){
-      if(status==0){
-        return { text: "Chưa", color: "error" };
-      }
-      if (status == 1) {
-        return { text: "Đã", color: "success" };
-      }
-      return {text: "Undefined", color: "more"};
-    },
-
     btPage(data) {
       this.pageNumber = data;
     },
@@ -201,9 +186,7 @@ export default {
     },
   },
   created() {
-    this.getParentLst();
-    //this.getStudentLst();
-    //this.getDistrictByCity();
+    this.getClassList();
   },
 };
 </script>

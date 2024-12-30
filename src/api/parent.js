@@ -2,7 +2,7 @@ import post from '@/utils/request'
 
 export function GetParentLst(data) {
   return post({
-    url: 'GSParent/GetParentLst',
+    url: 'GSParent/GetParentReqList',
     method: 'post',
     data
   })

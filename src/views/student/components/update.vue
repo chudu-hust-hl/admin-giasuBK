@@ -71,13 +71,6 @@
             rows="3"
             auto-grow
           ></v-textarea>
-          <v-textarea
-            v-model="studentEdit.Need"
-            label="Yêu cầu thêm"
-            row-height="20"
-            rows="3"
-            auto-grow
-          ></v-textarea>
         </v-col>
         <v-col cols="4">
           <v-select
@@ -97,10 +90,6 @@
             style="width: 100% !important"
           ></v-select>
           <v-text-field label="Cấp" v-model="studentEdit.Level"></v-text-field>
-          <v-text-field
-            label="Bán kính"
-            v-model="studentEdit.Radius"
-          ></v-text-field>
           <v-text-field
             label="Môn"
             v-model="studentEdit.Subjects"
@@ -127,12 +116,12 @@
 </template>
 
 <script>
-import { GSUpdateStudent } from "@/api/student";
+import { UpdateStudentReqInfo } from "@/api/student";
 import {
   GetCity,
   GetDistrictByCity,
   GetCommuneByCityAndDistrict,
-} from "@/api/default";
+} from "@/api/location";
 
 export default {
   props: {
@@ -187,14 +176,14 @@ export default {
     getCity() {
       GetCity({
       }).then((res) => {
-        this.cityLst = res.Data;
+        this.cityLst = res.LocationLst;
       });
     },
     getDistrictByCity() {
       GetDistrictByCity({
         City: this.studentEdit.City,
       }).then((res) => {
-        this.districtLst = res.Data;
+        this.districtLst = res.LocationLst;
       });
     },
     getCommuneByCityAndDistrict() {
@@ -202,12 +191,13 @@ export default {
         City: this.studentEdit.City,
         District: this.studentEdit.District,
       }).then((res) => {
-        this.communeLst = res.Data;
+        this.communeLst = res.LocationLst;
       });
     },
     updateStudent() {
-      GSUpdateStudent({
-        Data: this.studentEdit,
+      UpdateStudentReqInfo({
+        StudentID: this.studentEdit.StudentID,
+        StudentInfo: this.studentEdit,
       }).then((res) => {
         if (res.RespCode == 0) {
           notify({
