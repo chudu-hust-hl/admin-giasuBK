@@ -82,15 +82,15 @@ export default {
     return {
       headers: [
         { title: "STT", sortable: false, key: "Key", width: 50 },
-        { title: "Trạng thái", key: "Status", sortable: false },
-        { title: "Sinh viên", key: "StudentName", sortable: false },
+        { title: "Trạng thái", key: "Status", sortable: false, align: "center" },
+        { title: "Sinh viên", key: "StudentName", sortable: false, align: "center" },
         {
           title: "Liên hệ",
           key: "Phone",
           sortable: false,
           align: "center",
         },
-        { title: "Địa chỉ", key: "Address", sortable: false },
+        { title: "Địa chỉ", key: "Address", sortable: false, align: "center" },
         { title: "Cấp", key: "Level", sortable: false, align: "center" },
         { title: "Môn", key: "Subjects", sortable: false, align: "center" },
 
