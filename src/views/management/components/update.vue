@@ -33,13 +33,12 @@
 
             <!-- Student fields -->
             <v-text-field
-              label="Gia sư"
-              :model-value="classEdit.StudentID"
-              readonly
+              label="Mã số sinh viên Gia sư"
+              v-model="classEdit.StudentID"
             ></v-text-field>
 
             <v-text-field
-              label="Gia sư"
+              label="Tên Gia sư"
               :model-value="classEdit.StudentName"
               readonly
             ></v-text-field>
@@ -66,7 +65,6 @@
               label="Trạng thái"
               item-title="text"
               item-value="value"
-              style="width: 100% !important"
             ></v-select>
             <v-text-field
               label="Lớp"
